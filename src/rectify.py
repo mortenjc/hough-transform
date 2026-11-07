@@ -17,8 +17,8 @@ def main(args, lines):
     scale = 0.01
 
     # plotting
-    ptsz=1000/n
-    cols = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+    ptsz=2000/n
+    cols = ['r', 'm', 'y', 'g', 'b', 'c', 'k']
 
     # stupid and clumpsy random data generator
     pts = []
