@@ -7,47 +7,44 @@ from collections import defaultdict
 # ideal x coordinates for lines
 positions = [1/8 + n/8 for n in range(7)]
 
-def main(args, lines):
+
+def findnearest(x, y, lines):
     lx = np.asarray([x[0] for x in lines])
     ly = np.asarray([x[1] for x in lines])
     la = np.asarray([x[2] for x in lines])
 
+    angs = np.arctan2(y-ly,x-lx)
+    index = np.argmin(np.abs(angs-la))
+    return index
+
+
+def correct(x,y,lines, index):
+    x0, y0, a = lines[index]
+    cx = x0 + np.cos(a)/2
+    cy = y0 + np.sin(a)/2
+    ph = np.pi/2
+    a2 = (ph - a)
+    xp = (x-cx)*np.cos(a2) - (y-cy)*np.sin(a2) + positions[index]
+    yp = (x-cx)*np.sin(a2) + (y-cy)*np.cos(a2) + cy
+    return (xp, yp)
+
+
+def main(args, points, lines):
     # data generator
     n = args.p * len(lines)
-    scale = 0.01
 
     # plotting
     ptsz=2000/n
     cols = ['r', 'm', 'y', 'g', 'b', 'c', 'k']
 
-    # stupid and clumpsy random data generator
-    pts = []
-    for x,y,a in lines:
-        r = np.random.uniform(0.0, 1.0, args.p)
-        dr = np.random.normal(scale=scale, size=args.p*2).reshape(-1,2)
-        for i in range(args.p):
-            dx, dy = dr[i]
-            xx =  (x + dx + r[i]*np.cos(a)).item()
-            yy =  (y + dy + r[i]*np.sin(a)).item()
-            xx = min(max(xx, 0.05), 0.95)
-            yy = min(max(yy, 0.05), 0.95)
-            pts.append((xx,yy))
-
     CP = defaultdict(list)
     CPR = defaultdict(list)
-    for x, y in pts:
-        angs = np.arctan2(y-ly,x-lx)
-        res = np.argmin(np.abs(angs-la))
-        CP[res].append((x, y))
+    for x, y in points:
+        index = findnearest(x, y, lines)
+        xp, yp = correct(x,y, lines, index)
+        CP[index].append((x, y))
+        CPR[index].append((xp, yp))
 
-        x0, y0, a = lines[res]
-        cx = x0 + np.cos(a)/2
-        cy = y0 + np.sin(a)/2
-        ph = np.pi/2
-        a2 = (ph - a)
-        xp = (x-cx)*np.cos(a2) - (y-cy)*np.sin(a2) + positions[res]
-        yp = (x-cx)*np.sin(a2) + (y-cy)*np.cos(a2) + cy
-        CPR[res].append((xp, yp))
 
     assert len(CP.keys()) == len(CPR.keys())
     for key in CP.keys(): # CPR should have the same keys
@@ -67,6 +64,23 @@ def main(args, lines):
     plt.xlim((-0.1, 1.1))
     plt.ylim((-0.1, 1.1))
     plt.show()
+
+
+def makepoints(lines):
+    # stupid and clumpsy random data generator
+    scale = 0.01
+    pts = []
+    for x,y,a in lines:
+        r = np.random.uniform(0.0, 1.0, args.p)
+        dr = np.random.normal(scale=scale, size=args.p*2).reshape(-1,2)
+        for i in range(args.p):
+            dx, dy = dr[i]
+            xx =  (x + dx + r[i]*np.cos(a)).item()
+            yy =  (y + dy + r[i]*np.sin(a)).item()
+            xx = min(max(xx, 0.05), 0.95)
+            yy = min(max(yy, 0.05), 0.95)
+            pts.append((xx,yy))
+    return pts
 
 
 def makelines():
@@ -89,4 +103,6 @@ if __name__ == "__main__":
     np.random.seed(args.s)
 
     for cal in range(args.n):
-        main(args, makelines())
+        lines = makelines()
+        points = makepoints(lines)
+        main(args, points, lines)

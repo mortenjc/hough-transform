@@ -1,137 +1,149 @@
 import argparse
 from collections import defaultdict
-from functools import cache
 import math
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
 import sys
+import time
 
 
 def readfile(filename: str, n: int):
+    npts = 0
     D = defaultdict(list)
     with open(filename,"r") as f:
         for i, line in enumerate(f.readlines()):
             if i == 0: # skip legend
                 continue
             if i % n == 0:
+                npts += 1
                 p, q, r, f, t = line.strip().split()
                 key = f'{int(r):02x}{int(f):02x}{int(t):02x}'
                 D[key].append((float(q),float(p)))
-    return D
+    return D, npts
 
 
 def getxy(D, key):
     return [P for P in D[key]]
 
 
-def hough_lines_from_points(points, theta_res=1, rho_res=1):
-    """
-    Detects lines from a list of (x, y) coordinates using Hough Transform.
-    
-    :param points: List or array of tuples [(x1, y1), (x2, y2), ...]
-    :param theta_res: Angle resolution in degrees.
-    :param rho_res: Distance resolution in coordinate units.
-    """
+def hough_lines_from_points_opt(points, theta_res=1, rho_res=1):
     if len(points) == 0:
         return [], [], []
 
-    points = np.array(points)
-    # x_coords = points[:, 0]
-    # y_coords = points[:, 1]
+    points = np.asarray(points, dtype=float)
 
     thetas = np.deg2rad(np.arange(50.0, 140.0, theta_res))
-    cos_t = np.cos(thetas)
-    sin_t = np.sin(thetas)
-    
-    #max_dist = int(np.ceil(np.sqrt(np.max(x_coords)**2 + np.max(y_coords)**2)))
+    n_theta = len(thetas)
+
     max_dist = 2
     rhos = np.arange(-max_dist, max_dist, rho_res)
-    accumulator = np.zeros((len(rhos), len(thetas)), dtype=int)
+    n_rho = len(rhos)
 
-    for x, y in points:
-        current_rhos = x * cos_t + y * sin_t
-        
-        rho_idxs = np.round((current_rhos + max_dist) / rho_res).astype(int)
-        
-        for theta_idx, rho_idx in enumerate(rho_idxs):
-            if 0 <= rho_idx < len(rhos):
-                accumulator[rho_idx, theta_idx] += 1
+    # All rho values at once: (N, 2) @ (2, T) -> (N, T)
+    trig = np.vstack((np.cos(thetas), np.sin(thetas)))
+    current_rhos = points[:, :2] @ trig
+
+    rho_idxs = np.rint((current_rhos + max_dist) / rho_res).astype(np.intp)
+
+    # Keep only in-range votes, then count them all in one bincount call
+    theta_idxs = np.broadcast_to(np.arange(n_theta), rho_idxs.shape)
+    valid = (rho_idxs >= 0) & (rho_idxs < n_rho)
+    flat = rho_idxs[valid] * n_theta + theta_idxs[valid]
+
+    accumulator = np.bincount(flat, minlength=n_rho * n_theta)
+    accumulator = accumulator.reshape(n_rho, n_theta).astype(int, copy=False)
+
     return accumulator, thetas, rhos
 
 
-def find_peaks(arr, N=7):
-    local_max = (scipy.ndimage.maximum_filter(arr, size=3) == arr)
-    #print('local max', local_max)
-    max_indices = np.argwhere(local_max)
-    #print('max_indices', max_indices)
+# def hough_lines_from_points(points, theta_res=1, rho_res=1):
+#     if len(points) == 0:
+#         return [], [], []
+
+#     points = np.array(points)
+
+#     thetas = np.deg2rad(np.arange(50.0, 140.0, theta_res))
+#     cos_t = np.cos(thetas)
+#     sin_t = np.sin(thetas)
     
+#     #max_dist = int(np.ceil(np.sqrt(np.max(x_coords)**2 + np.max(y_coords)**2)))
+#     max_dist = 2
+#     rhos = np.arange(-max_dist, max_dist, rho_res)
+#     accumulator = np.zeros((len(rhos), len(thetas)), dtype=int)
+
+#     for x, y in points:
+#         current_rhos = x * cos_t + y * sin_t
+        
+#         rho_idxs = np.round((current_rhos + max_dist) / rho_res).astype(int)
+        
+#         for theta_idx, rho_idx in enumerate(rho_idxs):
+#             if 0 <= rho_idx < len(rhos):
+#                 accumulator[rho_idx, theta_idx] += 1
+#     return accumulator, thetas, rhos
+
+
+def find_peaks(arr, rhos, thetas, N=7):
+    local_max = (scipy.ndimage.maximum_filter(arr, size=3) == arr)
+    max_indices = np.argwhere(local_max)
     max_values = arr[local_max]
 
     top_n_indices = np.argsort(max_values)[-N:][::-1]
-    peak_coords = max_indices[top_n_indices]  # Array of (row, col)
+    peak_coords = max_indices[top_n_indices]
     #peak_vals = max_values[top_n_indices]
-    return [(float(x[0]), float(x[1])) for x in peak_coords]
-
+    return [(round(float(rhos[int(x[0])]),3),
+             round(float(thetas[int(x[1])]),3)) for x in peak_coords]
+     
 
 def check_all(D, args):
     bad = 0
-    toplot = 0
     keys = list(D.keys())
     print(f'keys in total {len(keys)}')
     res = {}
     for key in keys:
-        if toplot != 0 and toplot % 16 == 0:
-            plot(res)
-            res.clear()
-            toplot = 0
-
         points = getxy(D, key)
         pps = len(points)//7
 
-        acc, thetas, rhos = hough_lines_from_points(points, theta_res=1, rho_res=0.01)
-        peaks = find_peaks(acc)
+        acc, thetas, rhos = hough_lines_from_points_opt(points, theta_res=1, rho_res=0.01)
+        peaks = find_peaks(acc, rhos, thetas)
 
         ths = [x[1] for x in peaks]
-        th2 = [float(thetas[int(x)]) for x in ths]
-        th3 = [abs(x - 1.570796) for x in th2]
+        th3 = [abs(x - 1.570796) for x in ths]
         th4 = [1 if x < 0.07 else 0 for x in th3]
         isbad = sum(th4) != 7
         if  isbad or args.g:
             if isbad:
+                bad += 1
                 print(f'Bad  {bad:3} {key} (pps {pps}): {peaks}')
             else:
                 print(f'Good {bad:3} {key} (pps {pps}): {peaks}')
-            bad += 1
-            toplot += 1
-            res[key] =[points, acc, rhos, thetas, peaks]
-
+            res[key] =[points, peaks]
     return res
  
 
 def plot(results):
-    fig, ax = plt.subplots(4, 4, figsize=(20, 15), sharey=False)
     for i, d in enumerate(results):
-        points, acc, rhos, thetas, peaks = results[d]
-        xi = i // 4
-        yi = i % 4
+        if i == 0 or i % 16 == 0:
+            fig, ax = plt.subplots(4, 4, figsize=(20, 15), sharey=False)
+            fig.suptitle(f'Detection of skewed straws #{i//16}', fontsize=16)
 
-        fig.suptitle(f'Detection of skewed straws', fontsize=16)
+        points, peaks = results[d]
+        xi = (i%16) // 4
+        yi = (i%16) % 4
+
         ax[xi, yi].title.set_text(f'Key {d}')
         ax[xi, yi].title.set_fontsize(10)
         ax[xi, yi].scatter([p[1]for p in points], [p[0] for p in points], s=0.5)
-        for ri, thi in peaks:
-            r2 = rhos[int(ri)]
-            th2 = thetas[int(thi)]
+        for r2, th2 in peaks:
             point = (r2 * math.sin(th2), r2 * math.cos(th2))
             slope = math.tan(th2)
-            ax[xi, yi].axline(xy1=point, slope=-slope, color='red', linestyle='--', label='Slope=1.5 through (2,3)')
-    plt.draw()
+            ax[xi, yi].axline(xy1=point, slope=-slope, color='red',
+                              linestyle='--', label='Slope=1.5 through (2,3)')
+    plt.show()
 
 
 
 def find_nearest_line(point, lines):
-    #print(point, lines)
     x, y = point
     best = (-1, -1, -1, -1)
     mindist = 100
@@ -173,11 +185,16 @@ if __name__ == "__main__":
         print('Nothing to do ...')
         sys.exit()
 
-    D = readfile(args.f, args.n)
+    t0 = time.time()
+    D, n = readfile(args.f, args.n)
+    t1 = time.time()
     if args.a:
         print('Finding all bad straws')
         res = check_all(D, args)
+        t2 = time.time()
+        print(f'Load time {t2-t1:.1f}, process time {t2-t1:.1f}, pps {n/(t2-t1):.1f}')
         plot(res)
+        print('exiting ...')
         sys.exit()
 
     if args.p:
@@ -189,7 +206,7 @@ if __name__ == "__main__":
             sys.exit()
     
         print(f'points to fit {len(points)}, per straw {len(points)//7}')
-        acc, thetas, rhos = hough_lines_from_points(points, theta_res=1, rho_res=0.01)
+        acc, thetas, rhos = hough_lines_from_points_opt(points, theta_res=1, rho_res=0.01)
         peaks = find_peaks(acc)
 
         lines = []
