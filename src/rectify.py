@@ -29,6 +29,37 @@ def correct(x,y,lines, index):
     return (xp, yp)
 
 
+
+
+
+def makepoints(lines, scale=0.01, pts_per_straw=1000):
+    # stupid and clumpsy random data generator
+    pps = pts_per_straw
+    pts = []
+    for x,y,a in lines:
+        r = np.random.uniform(0.05, 0.95, pps)
+        dr = np.random.normal(scale=scale, size=pps*2).reshape(-1,2)
+        for i in range(pps):
+            dx, dy = dr[i]
+            xx =  (x + dx + r[i]*np.cos(a)).item()
+            yy =  (y + dy + r[i]*np.sin(a)).item()
+            xx = min(max(xx, 0.05), 0.95)
+            yy = min(max(yy, 0.05), 0.95)
+            pts.append((xx,yy))
+    return pts
+
+
+# lines are returned as (x, y, angle) NOT (r, theta)
+def makelines():
+    la, lb = np.sort(np.random.uniform(0.0, 1.0, 2))
+    ha, hb = np.sort(np.random.uniform(0.0, 1.0, 2))
+
+    x1 = np.linspace(la, lb, 7)
+    x2 = np.linspace(ha, hb, 7)
+    a = np.atan2(1, x2 - x1)
+    return [(x1[i], 0.0, a[i]) for i in range(7)]
+
+
 def main(args, points, lines):
     # data generator
     n = args.p * len(lines)
@@ -64,34 +95,6 @@ def main(args, points, lines):
     plt.xlim((-0.1, 1.1))
     plt.ylim((-0.1, 1.1))
     plt.show()
-
-
-def makepoints(lines):
-    # stupid and clumpsy random data generator
-    scale = 0.01
-    pts = []
-    for x,y,a in lines:
-        r = np.random.uniform(0.0, 1.0, args.p)
-        dr = np.random.normal(scale=scale, size=args.p*2).reshape(-1,2)
-        for i in range(args.p):
-            dx, dy = dr[i]
-            xx =  (x + dx + r[i]*np.cos(a)).item()
-            yy =  (y + dy + r[i]*np.sin(a)).item()
-            xx = min(max(xx, 0.05), 0.95)
-            yy = min(max(yy, 0.05), 0.95)
-            pts.append((xx,yy))
-    return pts
-
-
-def makelines():
-    la, lb = np.sort(np.random.uniform(0.0, 1.0, 2))
-    ha, hb = np.sort(np.random.uniform(0.0, 1.0, 2))
-
-    x1 = np.linspace(la, lb, 7)
-    x2 = np.linspace(ha, hb, 7)
-    a = np.atan2(1, x2 - x1)
-    return [(x1[i], 0.0, a[i]) for i in range(7)]
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
