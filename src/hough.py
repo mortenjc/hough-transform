@@ -6,8 +6,12 @@ import numpy as np
 import scipy
 import sys
 import time
+import rectify
+import plots
 
 
+
+# looks like q is y and p is x # TODO
 def readfile(filename: str, n: int):
     npts = 0
     D = defaultdict(list)
@@ -24,7 +28,7 @@ def readfile(filename: str, n: int):
 
 
 def getxy(D, key):
-    return [P for P in D[key]]
+    return D[key]
 
 
 def hough_lines_from_points_opt(points, theta_res=1, rho_res=1):
@@ -95,8 +99,9 @@ def find_peaks(arr, rhos, thetas, N=7):
              round(float(thetas[int(x[1])]),3)) for x in peak_coords]
      
 
-def check_all(D, args):
+def check_all(D, plot_good=False):
     bad = 0
+    refval = 1.570796
     keys = list(D.keys())
     print(f'keys in total {len(keys)}')
     res = {}
@@ -108,10 +113,10 @@ def check_all(D, args):
         peaks = find_peaks(acc, rhos, thetas)
 
         ths = [x[1] for x in peaks]
-        th3 = [abs(x - 1.570796) for x in ths]
+        th3 = [abs(x - refval) for x in ths]
         th4 = [1 if x < 0.07 else 0 for x in th3]
         isbad = sum(th4) != 7
-        if  isbad or args.g:
+        if  isbad or plot_good:
             if isbad:
                 bad += 1
                 print(f'Bad  {bad:3} {key} (pps {pps}): {peaks}')
@@ -164,6 +169,44 @@ def find_nearest_line(point, lines):
     return (x, y, i)
 
 
+def test_angles():
+    for i in range(10):
+        ang = np.pi/2 - 0.05*i
+        lines = [(0.1 + n/10, 0.0, ang) for n in range(7)]
+        # points are (y, x)
+        points = rectify.makepoints(lines, scale=0.005)
+
+        D = {}
+        key = '010203'
+        D[key] = points
+        res = check_all(D, True)
+        fitted_lines = res[key][1]
+        fitang = fitted_lines[0][1]
+        assert abs(ang + fitang - np.pi) < 0.01
+        # title = f'line: {ang:.3} ({np.rad2deg(ang):5.3} deg), fitted {fitang:.3} ({np.rad2deg(fitang):5.3} deg)'
+        # plots.points_lines(points=points, lines=fitted_lines, title=title)
+
+
+def test_vertical_lines():
+    ang = np.pi/2
+    lines = [(0.1 + n/10, 0.0, ang) for n in range(7)]
+
+    # points are (y, x)
+    points = rectify.makepoints(lines, scale=0.005)
+
+    D = {}
+    key = '010203'
+    D[key] = points
+    res = check_all(D, True)
+    fitted_lines = res[key][1]
+    a = sum([x[0] for x in fitted_lines])
+    assert 2.799 < a < 2.801
+    assert ang - 0.001 < np.pi/2 < ang + 0.001
+    #assert all((fitted_lines[0][1] == x[1] for x in fitted_lines))
+    # fitang = fitted_lines[0][1]
+    # title = f'line: {ang:.3} ({np.rad2deg(ang):5.3} deg), fitted {fitang:.3} ({np.rad2deg(fitang):5.3} deg)'
+    # plots.points_lines(points=points, lines=fitted_lines, title=title)
+
 
 
 # ------------------------------------------------------------------- demo
@@ -178,9 +221,15 @@ if __name__ == "__main__":
     parser.add_argument("-p", help = "plot data", action='store_true')
     parser.add_argument("-a", help = "find all bad lines", action='store_true')
     parser.add_argument("-g", help = "also show good tubes", action='store_true')
+    parser.add_argument("--test", help = "run tests", action='store_true')
     parser.add_argument("-v", help = "verbose", action='store_true')
-
     args = parser.parse_args()
+
+    if args.test:
+        test_vertical_lines()
+        test_angles()
+        sys.exit()
+
     if not (args.a or args.p):
         print('Nothing to do ...')
         sys.exit()
@@ -190,7 +239,7 @@ if __name__ == "__main__":
     t1 = time.time()
     if args.a:
         print('Finding all bad straws')
-        res = check_all(D, args)
+        res = check_all(D)
         t2 = time.time()
         print(f'Load time {t2-t1:.1f}, process time {t2-t1:.1f}, pps {n/(t2-t1):.1f}')
         plot(res)
