@@ -40,10 +40,12 @@ Finding Lines
 -------------
 
 A line is described by two parameters, (:math:`\rho, \theta`). Where :math:`\rho` is the 
-perpendicular distance to the line, and :math:`\theta` is the angle of :math:`\rho`.
+perpendicular (algebraic) distance to the line, and :math:`\theta` is the angle of :math:`\rho`.
+In general, the parameters can be restricted to :math:`-R \le \rho \le R` and 
+:math:`\theta \in [0 ; \pi[`.
 
 .. figure:: images/rhotheta.png
-  :width: 800
+  :width: 600
   :align: center
 
   Definition of :math:`\rho` and :math:`\theta`.
