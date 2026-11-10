@@ -22,11 +22,12 @@ out so they look like those on the right image.
   End goal is to 'rectify' points that cluster around lines
 
 .. toctree::
-   :caption: Practical
+   :caption: Info
    :maxdepth: 2
    :hidden:
 
    examples
+
 
 Algorithm History
 =================
@@ -36,18 +37,16 @@ to solve the problem in an elegant and effectve way.
 
 The original paper (1959) [#f1]_ is not directly applicable to computer
 implementation, and so later developments have made the idea more tenable.
-
 Applied to the field of finding geometric figures in images, the first
 'modern' reference is from 1972 [#f2]_.
-
 Interestingly, the Hough Transform is claimed to be a particular application of 
 the Radon Transform (1917) [#f3]_.
 
 .. rubric:: Footnotes
 
-.. [#f1] Machine Analysis of Bubble Chamber Pictures - https://algs4.cs.princeton.edu
-.. [#f2] Use of the Hough transformation to detect lines and curves in pictures - https://dl.acm.org/doi/10.1145/361237.361242
-.. [#f3] Radon Transform - https://en.wikipedia.org/wiki/Radon_transform
+.. [#f1] `Machine Analysis of Bubble Chamber Pictures <http://inspirehep.net/record/919922/files/HEACC59_598-602.pdf>`_ 
+.. [#f2] `Use of the Hough transformation to detect lines and curves in pictures <https://dl.acm.org/doi/10.1145/361237.361242>`_
+.. [#f3] `Radon Transform <https://en.wikipedia.org/wiki/Radon_transform>`_
 
 Finding Lines
 =============
