@@ -10,4 +10,11 @@ space to identify lines in the data.
 The application comes from the LOKI small angle scattering instrumet
 at European Spallation Source.
 
-(testing github integration)
+.. figure:: images/goal.jpg
+  :width: 800
+  :align: center
+
+  End goal is to 'rectify' points that cluster around lines
+
+
+  
