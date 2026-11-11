@@ -66,20 +66,18 @@ def main(args, points, lines):
     plt.show()
 
 
-def makepoints(lines):
+def makepoints(lines, scale=0.01, pts_per_straw=1000):
     # stupid and clumpsy random data generator
-    scale = 0.01
+    pps = pts_per_straw
     pts = []
     for x,y,a in lines:
-        r = np.random.uniform(0.0, 1.0, args.p)
-        dr = np.random.normal(scale=scale, size=args.p*2).reshape(-1,2)
-        for i in range(args.p):
+        r = np.random.uniform(0.05, 0.95, pps)
+        dr = np.random.normal(scale=scale, size=pps*2).reshape(-1,2)
+        for i in range(pps):
             dx, dy = dr[i]
             xx =  (x + dx + r[i]*np.cos(a)).item()
             yy =  (y + dy + r[i]*np.sin(a)).item()
-            xx = min(max(xx, 0.05), 0.95)
-            yy = min(max(yy, 0.05), 0.95)
-            pts.append((xx,yy))
+            pts.append((yy,xx))
     return pts
 
 
