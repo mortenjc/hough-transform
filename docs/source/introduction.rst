@@ -45,10 +45,25 @@ very specific values. Finding the most likely line is then a matter of finding t
 The ESS LOKI case
 =================
 
-In my particular application, there are some restrictions due to electric 
+This section provides some LOKI specific details that have been included
+just in case you were interested.
+
+In this particular application, there are some restrictions due to electric 
 engineering. For example there should always be seven lines and all (x,y)
 values are in the unit interval from 0.0 to 1.0.
 
+The LOKI detectors consist of stacking of detector tubes that are bring 
+read-out by frontend nodes arranged optical rings.
+
+I use the Ring, FEN, Tube identifiers to create dictionary keys like 
+'020501' meaning Ring 2, FEN 5 Tube 1. Each tube will have data 
+arranged in vertical lines. In the normal (good) case they look like this.
+
+.. figure:: images/good_straws.png
+  :width: 400
+  :align: center
+
+  Normal (good) LOKI data. Here from Ring 5, FEN 0, Tube 4.
 
 
 
