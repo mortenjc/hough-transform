@@ -9,7 +9,7 @@ Finding lines
 
 This example reads **large.txt** and finds lines that are more than 4 degrees away from vertical.
 
-.. text:
+.. code-block:: text
 
     hough-transform/src > python hough.py -f ../data/large.txt -p -t 4.0
     020106 [(0.98, 1.763), (0.0, 1.536), (1.0, 1.606), (0.1, 1.484), (-0.07, 1.169), (0.07, 1.449), (-0.1, 1.134)]
@@ -26,12 +26,13 @@ This example reads **large.txt** and finds lines that are more than 4 degrees aw
     050402 [(0.17, 1.658), (0.32, 1.815), (0.03, 1.588), (0.45, 2.042), (0.52, 2.269), (0.51, 2.304), (0.44, 2.112)]
     050403 [(0.17, 1.641), (0.03, 1.588), (0.8, 1.78), (0.97, 1.623), (0.64, 1.815), (0.33, 1.728), (0.49, 1.798)]
 
+
 Saving line parameters
 ----------------------
 
 The line parameters can be saved to a json file
 
-.. text:
+.. code-block:: text
 
     hough-transform/src > python hough.py -f ../data/large.txt -p -t 4.0 -s four_degrees.json
     020106 [(0.98, 1.763), (0.0, 1.536), (1.0, 1.606), (0.1, 1.484), (-0.07, 1.169), (0.07, 1.449), (-0.1, 1.134)]
@@ -57,10 +58,11 @@ The line parameters can be saved to a json file
     ...
     >
 
+
 Plotting points with lines
 --------------------------
 
-.. text:
+.. code-block:: text
 
     hough-transform/src > python hough.py -f ../data/large.txt -p -t 4.0
 
@@ -70,3 +72,5 @@ Plotting points with lines
   :align: center
 
   Plots of points and their lines with different 'key' values
+
+  
