@@ -95,9 +95,12 @@ if __name__ == "__main__":
     parser.add_argument("-p", help = "plot results", action='store_true')
     #parser.add_argument("-g", help = "also show good tubes", action='store_true')
     parser.add_argument("-s", help = "save lines", type = str, default = "")
+    parser.add_argument("-t", help = "line skew tolerance (deg)", type = float, default = 1.0)
     args = parser.parse_args()
 
     D, n = fileops.readfile(args.f)
+
+    args.t = np.deg2rad(args.t)
 
     fitted_lines = {}
     res = {}
@@ -105,7 +108,7 @@ if __name__ == "__main__":
         points = D[key]
         lines = check_points(points)
 
-        if are_skewed(lines):
+        if are_skewed(lines, tolerance=args.t):
             print(key, lines)
             fitted_lines[key] = lines
             res[key] = (points, lines)
