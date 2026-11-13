@@ -42,6 +42,13 @@ very specific values. Finding the most likely line is then a matter of finding t
 (:math:`\rho_i, \theta_i`) pair of the accumulator entry with the highest count.
 
 
+.. figure:: images/accumulator.png
+  :width: 800
+  :align: center
+
+  Accumulator heatmaps
+
+
 The ESS LOKI case
 =================
 
