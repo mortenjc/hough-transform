@@ -77,3 +77,17 @@ Plotting points with lines
 
   Plots of points and their lines with different 'key' values
 
+
+Plotting the accumulator
+------------------------
+
+.. code-block:: text
+
+    hough-transform/src > python hough.py -f ../data/large.txt -t 3.5 -a
+
+
+.. figure:: images/acc_zoomed.png
+  :width: 800
+  :align: center
+
+  Heatmap of the accumulator array

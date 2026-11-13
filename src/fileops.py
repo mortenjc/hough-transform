@@ -23,6 +23,6 @@ def readfile(filename: str):
                 continue
             npts += 1
             x, y, r, f, t = line.strip().split()
-            key = f'{int(r):02x}{int(f):02x}{int(t):02x}'
+            key = f'{int(r):02}_{int(f):02}_{int(t):02}'
             D[key].append((float(x),float(y)))
     return D, npts

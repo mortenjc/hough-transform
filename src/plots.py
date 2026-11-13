@@ -38,6 +38,7 @@ def tiled_accumulator(results, title='', fontsize=16):
 
 
 def tiled_lines(results, title='', fontsize=16):
+    deflines = [1/7 + n/7 for n in range(6)]
     for i, key in enumerate(results):
         if i == 0 or i % 16 == 0:
             fig, ax = plt.subplots(4, 4, figsize=(15, 10), sharey=False, constrained_layout=True)
@@ -53,9 +54,12 @@ def tiled_lines(results, title='', fontsize=16):
         ax[xi, yi].title.set_fontsize(fontsize/2)
         ax[xi, yi].scatter(x, y, s=0.5)
 
+        for l in deflines:
+             ax[xi, yi].axline(xy1=(l, 0.0), xy2=(l, 1.0), color='blue', linewidth=0.5)
+
         for r2, th2 in lines:
             point = (r2 * math.sin(th2), -r2 * math.cos(th2))
             slope = math.tan(th2)
-            ax[xi, yi].axline(xy1=point, slope=slope, color='red')
+            ax[xi, yi].axline(xy1=point, slope=slope, color='red', linewidth=1)
 
     plt.show()
