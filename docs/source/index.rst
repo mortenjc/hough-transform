@@ -27,4 +27,5 @@ out so they look like those on the right image.
    :hidden:
 
    introduction
+   files
    examples

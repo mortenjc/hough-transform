@@ -2,12 +2,12 @@ from collections import defaultdict
 import json
 
 
-def save_lines(filename, dict):
+def save_data(filename, data):
     with open(filename, "w") as f:
-        json.dump(dict, f, indent=4)
+        json.dump(data, f, indent=4)
 
 
-def load_lines(filename):
+def load_data(filename):
     with open(filename, "r") as f:
         data = json.load(f)
     return data

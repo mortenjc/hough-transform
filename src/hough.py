@@ -125,7 +125,7 @@ if __name__ == "__main__":
 
     if args.s:
         print('saving lines to file', args.s)
-        fileops.save_lines(args.s, fitted_lines)
+        fileops.save_data(args.s, fitted_lines)
 
     if args.a:
         plots.tiled_accumulator(accs, title='Accumulator ')
