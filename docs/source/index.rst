@@ -23,10 +23,10 @@ out so they look like those on the right image.
 
   So the problems consists of two sub problems
 
-  1 finding the line equations for a given set of (x,y) points
-  2 translating and rotating the points to straighten out the lines
+#. finding the line equations for a given set of (x,y) points
+#. translating and rotating the points to straighten out the lines
 
-  
+
 
 .. toctree::
    :caption: Table of Contents
