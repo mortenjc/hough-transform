@@ -18,6 +18,10 @@ the Radon Transform (1917) [#f3]_.
 .. [#f2] `Use of the Hough transformation to detect lines and curves in pictures <https://dl.acm.org/doi/10.1145/361237.361242>`_
 .. [#f3] `Radon Transform <https://en.wikipedia.org/wiki/Radon_transform>`_
 
+
+The code writting as part of this investigation can be found on `GitHub <https://github.com/mortenjc/hough-transform>`_.
+
+
 Finding Lines
 =============
 
