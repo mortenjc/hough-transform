@@ -106,3 +106,28 @@ Specify number of lines
   :align: center
 
   Showing 17 lines
+
+
+Rectify lines
+-------------
+
+The current proof of concept should be improved but this demonstrates that
+the approach is valid.
+
+.. code-block:: text
+
+    hough-transform/src > python rectify.py -f ~/huge.txt -l huge.json
+
+
+.. figure:: images/before_rectify.png
+  :width: 800
+  :align: center
+
+  Before rectifying
+
+
+.. figure:: images/after_rectify.png
+  :width: 800
+  :align: center
+
+  After rectifying
