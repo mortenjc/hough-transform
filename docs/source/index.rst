@@ -19,12 +19,18 @@ out so they look like those on the right image.
   :width: 800
   :align: center
 
-  End goal is to 'rectify' points that cluster around lines
+  End goal is to 'rectify' points that cluster around lines.
+
+  So the problems consists of two sub problems
+
+  1 finding the line equations for a given set of (x,y) points
+  2 translating and rotating the points to straighten out the lines
+
+  
 
 .. toctree::
    :caption: Table of Contents
-   :maxdepth: 2
-   :hidden:
+   :maxdepth: 3
 
    introduction
    files
