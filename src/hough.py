@@ -89,6 +89,7 @@ if __name__ == "__main__":
     parser.add_argument("-f", help = "file to read", type = str, default = "", required=True)
     parser.add_argument("-k", help = "check single key", type = str, default = "")
     parser.add_argument("-t", help = "line skew tolerance (deg)", type = float, default = 1.0)
+    parser.add_argument("-N", help = "number of lines to find", type = int, default = 7)
     parser.add_argument("-a", help = "plot accumulator", action='store_true')
     parser.add_argument("-p", help = "plot results", action='store_true')
     parser.add_argument("-v", help = "verbose", action='store_true')
@@ -115,7 +116,7 @@ if __name__ == "__main__":
     accs = {}
     for key in D:
         points = D[key]
-        acc, thetas, rhos, lines = check_points(points)
+        acc, thetas, rhos, lines = check_points(points, N=args.N)
 
         if are_skewed(lines, tolerance=args.t):
             if args.v: print(key, lines)
@@ -131,6 +132,9 @@ if __name__ == "__main__":
         plots.tiled_accumulator(accs, title='Accumulator ')
 
     if args.p:
-        plots.tiled_lines(res, title='Bad tubes ')
+        if args.k:
+            plots.tiled_lines_single(res, key, title='Bad tubes ')
+        else:
+            plots.tiled_lines(res, title='Bad tubes ')
 
 

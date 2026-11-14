@@ -91,3 +91,18 @@ Plotting the accumulator
   :align: center
 
   Heatmap of the accumulator array
+
+
+Specify number of lines
+-----------------------
+
+.. code-block:: text
+
+    hough-transform/src > python hough.py -f ../data/large.txt -t 3.5 -p -N 17
+
+
+.. figure:: images/large_n.png
+  :width: 800
+  :align: center
+
+  Showing 17 lines

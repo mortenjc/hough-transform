@@ -48,6 +48,8 @@ def tiled_lines(results, title='', fontsize=16):
         xi = (i%16) // 4
         yi = (i%16) % 4
 
+        #print(points)
+
         x = [p[0] for p in points]
         y = [p[1] for p in points]
         ax[xi, yi].title.set_text(f'Key {key}')
@@ -55,11 +57,39 @@ def tiled_lines(results, title='', fontsize=16):
         ax[xi, yi].scatter(x, y, s=0.5)
 
         for l in deflines:
-             ax[xi, yi].axline(xy1=(l, 0.0), xy2=(l, 1.0), color='blue', linewidth=0.5)
+             ax[xi, yi].axline(xy1=(l, 0.0), xy2=(l, 1.0), color='blue', linewidth=0.5, alpha=0.5)
 
         for r2, th2 in lines:
             point = (r2 * math.sin(th2), -r2 * math.cos(th2))
             slope = math.tan(th2)
             ax[xi, yi].axline(xy1=point, slope=slope, color='red', linewidth=1)
+
+    plt.show()
+
+
+
+
+def tiled_lines_single(results, key, title='', fontsize=16):
+    deflines = [1/7 + n/7 for n in range(6)]
+    fig, ax = plt.subplots(1, 1, figsize=(5, 4), sharey=False, constrained_layout=True)
+    fig.suptitle(title, fontsize=fontsize)
+
+    points, lines = results[key]
+
+    #print(points)
+
+    x = [p[0] for p in points]
+    y = [p[1] for p in points]
+    ax.title.set_text(f'Key {key}')
+    ax.title.set_fontsize(fontsize/2)
+    ax.scatter(x, y, s=0.5)
+
+    for l in deflines:
+            ax.axline(xy1=(l, 0.0), xy2=(l, 1.0), color='blue', linewidth=0.5, alpha=0.5)
+
+    for r2, th2 in lines:
+        point = (r2 * math.sin(th2), -r2 * math.cos(th2))
+        slope = math.tan(th2)
+        ax.axline(xy1=point, slope=slope, color='red', linewidth=1)
 
     plt.show()

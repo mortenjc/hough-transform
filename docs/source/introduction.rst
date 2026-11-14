@@ -48,6 +48,22 @@ very specific values. Finding the most likely line is then a matter of finding t
 
   Accumulator heatmaps
 
+Improvements
+------------
+
+The line finding algorithm just picks the N lines with the largest amplitudes. As mentioend below
+in my application the expected number of (useful) lines, N, is seven. In a few cases, picking
+the N largest amplitudes does not cover all points. Sown below is a case where N had to be
+increased to 18 in order to capture all lines. I assume that having better counting statistics
+combined with a more robust peak finder could improve this.
+
+.. figure:: images/large_n.png
+  :width: 800
+  :align: center
+
+  Several solutions are found for some of the lines. Here N=17 was needed to cover all data points.
+
+
 
 The ESS LOKI case
 =================
@@ -71,7 +87,5 @@ arranged in vertical lines. In the normal (good) case they look like this.
   :align: center
 
   Normal (good) LOKI data. Here from Ring 5, FEN 0, Tube 4.
-
-
 
 
