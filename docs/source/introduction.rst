@@ -62,7 +62,7 @@ increased to 18 in order to capture all lines. I assume that having better count
 combined with a more robust peak finder could improve this.
 
 .. figure:: images/large_n.png
-  :width: 600
+  :width: 400
   :align: center
 
   Several solutions are found for some of the lines. Here N=17 was needed to cover all data points.
