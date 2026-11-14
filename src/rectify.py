@@ -2,6 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 from collections import defaultdict
+import fileops
+import plots
+import math
 
 
 # ideal x coordinates for lines
@@ -9,23 +12,29 @@ positions = [1/8 + n/8 for n in range(7)]
 
 
 def findnearest(x, y, lines):
-    lx = np.asarray([x[0] for x in lines])
-    ly = np.asarray([x[1] for x in lines])
-    la = np.asarray([x[2] for x in lines])
+    r = np.asarray([x[0] for x in lines])
+    a = np.asarray([x[1] for x in lines])
+    #print(r, a)
+    lx = r*np.sin(a)
+    ly = -r*np.cos(a)
 
     angs = np.arctan2(y-ly,x-lx)
-    index = np.argmin(np.abs(angs-la))
+    index = np.argmin(np.abs(angs-a))
     return index
 
 
 def correct(x,y,lines, index):
-    x0, y0, a = lines[index]
-    cx = x0 + np.cos(a)/2
-    cy = y0 + np.sin(a)/2
+    assert len(lines) == 7
     ph = np.pi/2
-    a2 = (ph - a)
-    xp = (x-cx)*np.cos(a2) - (y-cy)*np.sin(a2) + positions[index]
-    yp = (x-cx)*np.sin(a2) + (y-cy)*np.cos(a2) + cy
+    r, theta = lines[index]
+
+    cx = r
+    cy = 0.0
+    rota = (ph - theta)
+
+    xp = (x-cx)*np.cos(rota) - (y-cy)*np.sin(rota) + cx
+    yp = (x-cx)*np.sin(rota) + (y-cy)*np.cos(rota) + cy
+    #print(f'r,theta (rota): {r},{theta}({rota}) - x,y {x},{y}, cx, cy {cx:.4f},{cy:.4f}: final x,y {xp:.4f},{yp:.4f}')
     return (xp, yp)
 
 
@@ -93,14 +102,46 @@ def makelines():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", help = "seed", type = int, default = 42)
-    parser.add_argument("-p", help = "points per straw", type = int, default = 1000)
-    parser.add_argument("-n", help = "number of runs", type = int, default = 1)
+    parser.add_argument("-f", help = "data file to read", type = str, default = "", required=True)
+    parser.add_argument("-k", help = "check single key", type = str, default = "")
+    parser.add_argument("-l", help = "lines", type = str, default = "")
     args = parser.parse_args()
 
-    np.random.seed(args.s)
+    if args.l:
+        L = fileops.load_data(args.l)
+    else:
+        L = {}
 
-    for cal in range(args.n):
-        lines = makelines()
-        points = makepoints(lines)
-        main(args, points, lines)
+    D, n = fileops.readfile(args.f)
+
+
+
+if args.k:
+    mjc = {}
+    key = args.k
+    points = D[key]
+    lines = L[key]
+    plots.points_lines({key:(points, L[key])}, key)
+    
+    res = {}
+    tmp = []
+    for x, y in points:
+        i = findnearest(x,y,lines)
+        xc, yc = correct(x, y, lines, i)
+        tmp.append([xc,yc])
+    res[key] = (tmp, lines)
+    plots.points_lines(res, key)
+    sys.exit()
+
+res = {}
+for key in L:
+    tmp = []
+    points = D[key]
+    lines = L[key]
+    for x,y in points:
+        i = findnearest(x,y,lines)
+        xc, yc = correct(x, y, lines, i)
+        tmp.append([xc,yc])
+    res[key] = (tmp, lines)
+
+plots.tiled_lines(res, plotlines=False)

@@ -16,7 +16,7 @@ def hough_lines_from_points_opt(points, theta_res=1, rho_res=1):
 
     points = np.asarray(points, dtype=float)
 
-    thetas = np.deg2rad(np.arange(40.0, 140.0, theta_res))
+    thetas = np.deg2rad(np.arange(10.0, 200.0, theta_res))
     n_theta = len(thetas)
 
     max_dist = 2
@@ -102,8 +102,8 @@ if __name__ == "__main__":
         sys.exit()
 
     if args.v: print('loading file', args.f)
-
     ldict, n = fileops.readfile(args.f)
+
     if args.k:
         D = {args.k:ldict[args.k]}
     else:
@@ -133,7 +133,7 @@ if __name__ == "__main__":
 
     if args.p:
         if args.k:
-            plots.tiled_lines_single(res, key, title='Bad tubes ')
+            plots.points_lines(res, key, title='Tube ' + args.k)
         else:
             plots.tiled_lines(res, title='Bad tubes ')
 
